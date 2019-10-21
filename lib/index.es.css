@@ -1,0 +1,25 @@
+.tantuer-tab > .ant-tabs-card > .ant-tabs-card-bar.ant-tabs-bar {
+  margin-bottom: 0;
+}
+.tantuer-tab > .ant-tabs-card > .ant-tabs-card-bar.ant-tabs-bar > .ant-tabs-nav-container {
+  height: 42px;
+  padding: 6px 0;
+}
+.tantuer-tab > .ant-tabs-card > .ant-tabs-card-bar.ant-tabs-bar > .ant-tabs-nav-container > .ant-tabs-nav-wrap > .ant-tabs-nav-scroll > .ant-tabs-nav > div .ant-tabs-tab {
+  height: 28px;
+  padding: 0 6px;
+  line-height: 28px;
+  border: 1px solid #ddd;
+  border-radius: 0;
+  color: #333;
+  font-size: 12px;
+  margin: 0 4px;
+}
+.tantuer-tab > .ant-tabs-card > .ant-tabs-card-bar.ant-tabs-bar > .ant-tabs-nav-container > .ant-tabs-nav-wrap > .ant-tabs-nav-scroll > .ant-tabs-nav > div .ant-tabs-tab-active {
+  background: #42b983;
+  border-color: transparent;
+  color: #fff;
+}
+.tantuer-tab > .ant-tabs-card > .ant-tabs-card-bar .ant-tabs-nav .ant-tabs-tab .anticon {
+  margin-right: 5px;
+}
