@@ -1,6 +1,6 @@
 {
   "name": "tantuer-react-components",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "react 组件库，基础基于antd组件库，进行一些扩展，以及平时自己封装的一些特定场景的组件和方法",
   "main": "lib/index.js",
   "module": "lib/index.es.js",
