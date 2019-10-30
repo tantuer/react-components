@@ -1,0 +1,57 @@
+.splitter-pannel {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  &.splitter-pannel-vertical {
+    & > div > .splitter-item {
+      position: relative;
+      display: flex;
+      width: 100%;
+      height: 100%;
+      .cover {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+      }
+      & > .drag-line {
+        position: absolute;
+        top: -1px;
+        left: 0;
+        z-index: 2;
+        width: 100%;
+        height: 5px;
+        cursor: row-resize;
+        background: #ccc;
+        &.nobg {
+          background: none;
+        }
+      }
+    }
+  }
+  &.splitter-pannel-horizontal {
+    display: flex;
+    flex-direction: row;
+    & > div > .splitter-item {
+      position: relative;
+      height: 100%;
+      .cover {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+      }
+      & > .drag-line {
+        position: absolute;
+        top: 0;
+        left: -2px;
+        width: 2px;
+        z-index: 2;
+        height: 100%;
+        cursor: col-resize;
+        background: #ccc;
+      }
+    }
+  }
+}

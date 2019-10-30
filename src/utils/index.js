@@ -9,3 +9,24 @@ export const randomKey = () => {
   s[8] = s[13] = s[18] = s[23] = '_';
   return s.join('');
 };
+/**
+ * deepCopy 深拷贝
+ * @source : 对象或者数组
+ * @maxLevel: 最大拷贝的深度
+ * @level:当前拷贝深度
+ *  */
+export const deepCopy = (source, maxLevel, level) => {
+  const sourceCopy = source instanceof Array ? [] : {};
+  for (let key in source) {
+    if (level >= maxLevel) {
+      sourceCopy[key] = source[key];
+      return;
+    }
+    if (source[key] instanceof Object) {
+      sourceCopy[key] = deepCopy(source[key], maxLevel, level++);
+    } else {
+      sourceCopy[key] = source[key];
+    }
+  }
+  return sourceCopy;
+};
