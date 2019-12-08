@@ -12,23 +12,14 @@ const y = {
   end: 0
 };
 class SplitterPannelItem extends Component {
-  static getDerivedStateFromProps(nextProps) {
-    return {
-      ...nextProps
-    };
-  }
   constructor() {
     super();
-    this.state = {
-      move: false
-    };
+    this.state = {};
   }
   componentDidMount() {}
 
   onPanStart = event => {
-    this.setState({
-      move: true
-    });
+    this.props.moving(true);
     if (this.props.vertical) {
       this.onPanStartY(event);
     } else {
@@ -37,9 +28,7 @@ class SplitterPannelItem extends Component {
   };
 
   onPanMove = event => {
-    this.setState({
-      move: true
-    });
+    this.props.moving(true);
     if (this.props.vertical) {
       this.onPanY(event);
     } else {
@@ -48,73 +37,68 @@ class SplitterPannelItem extends Component {
   };
 
   onPanStartX = event => {
-    x.start = this.state.size;
+    x.start = this.props.size;
     const direction = event.velocityX <= 0 ? 'up' : 'down';
-    this.props.countStart(x.start, event.deltaX, this.state.index, direction);
+    this.props.countStart(x.start, event.deltaX, this.props.index, direction);
   };
 
   onPanX = event => {
     const direction = event.velocityX <= 0 ? 'up' : 'down';
-    if (x.start - event.deltaX > this.state.max) {
-      x.move = this.state.max;
-    } else if (x.start - event.deltaX < this.state.min) {
-      x.move = this.state.min;
+    if (x.start - event.deltaX > this.props.max) {
+      x.move = this.props.max;
+    } else if (x.start - event.deltaX < this.props.min) {
+      x.move = this.props.min;
     } else {
       x.move = x.start - event.deltaX;
     }
-    this.props.countMove(x.move, x.start - event.deltaX - x.move, this.state.index, direction);
+    this.props.countMove(x.move, x.start - event.deltaX - x.move, this.props.index, direction);
   };
 
   onPanStartY = event => {
-    y.start = this.state.size;
+    y.start = this.props.size;
     const direction = event.velocityY <= 0 ? 'up' : 'down';
-    this.props.countStart(y.start, event.deltaY, this.state.index, direction);
+    this.props.countStart(y.start, event.deltaY, this.props.index, direction);
   };
   onPanY = event => {
     const direction = event.velocityY <= 0 ? 'up' : 'down';
-    if (y.start - event.deltaY > this.state.max) {
-      y.move = this.state.max;
-    } else if (y.start - event.deltaY < this.state.min) {
-      y.move = this.state.min;
+    if (y.start - event.deltaY > this.props.max) {
+      y.move = this.props.max;
+    } else if (y.start - event.deltaY < this.props.min) {
+      y.move = this.props.min;
     } else {
       y.move = y.start - event.deltaY;
     }
-    this.props.countMove(y.move, y.start - event.deltaY - y.move, this.state.index, direction);
+    this.props.countMove(y.move, y.start - event.deltaY - y.move, this.props.index, direction);
   };
 
   onPanEnd = event => {
-    this.setState({
-      move: false
-    });
+    this.props.moving(false);
     this.props.countEnd();
   };
 
   open = () => {
-    if (this.state.size > this.state.min) {
+    if (this.props.size > this.props.min) {
       this.props.countStart();
-      this.props.countMove(this.state.min, 0, this.state.index, 'down');
+      this.props.countMove(this.props.min, 0, this.props.index, 'down');
     } else {
-      this.props.countStart(this.state.size, 0, this.state.index, 'up');
-
-      this.props.countMove(this.state.openDefault, 0, this.state.index, 'up');
+      this.props.countStart(this.props.size, 0, this.props.index, 'up');
+      this.props.countMove(this.props.openDefault, 0, this.props.index, 'up');
     }
   };
   onPress = event => {
-    this.setState({
-      move: true
-    });
+    this.props.moving(true);
   };
   render() {
-    const { children } = this.props;
-    const { size } = this.state;
+    const { children, size } = this.props;
     const style = this.props.vertical ? { height: size + 'px' } : { width: size + 'px' };
-    const lineClass = `drag-line ${this.props.lineClass}`;
+    const prop =
+      children.type instanceof Object ? { toggle: this.open, isMin: !(this.props.size > this.props.min) } : {};
     return (
       <div style={style}>
-        <div className="splitter-item">
-          {this.state.move && <div className="cover" />}
-          {React.cloneElement(children, { open: this.open })}
-          {this.state.index !== 0 && (
+        <div className='splitter-item'>
+          {this.props.isMoving && <div className='cover' />}
+          {React.cloneElement(children, prop)}
+          {this.props.index !== 0 && (
             <Hammer
               onPress={this.onPress}
               onPanStart={this.onPanStart}
@@ -122,7 +106,7 @@ class SplitterPannelItem extends Component {
               onPanEnd={this.onPanEnd}
               options={{ domEvents: true }}
             >
-              <div className={lineClass} />
+              <div className={this.props.lineClass ? `drag-line ${this.props.lineClass}` : 'drag-line'} />
             </Hammer>
           )}
         </div>

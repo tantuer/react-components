@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import Pannel from './SplitterPannelItem.jsx';
-import { deepCopy } from '../../utils';
+import Pannel from './SplitterPannelItem';
+import { deepCopy } from '../../utils/utils';
 import './index.less';
 
 class SplitterPannel extends Component {
@@ -26,16 +26,59 @@ class SplitterPannel extends Component {
     };
   }
   componentDidMount() {
-    this.setDefaultProps(this.props.children);
+    const children = this.props.children instanceof Array ? this.props.children : [this.props.children];
+    this.setDefaultProps(children);
     window.addEventListener('resize', this.resize);
   }
-  componentDidUpdate(nextProps) {
-    const currentChildren = this.props.children.filter(item => item);
-    const nextChildren = nextProps.children.filter(item => item);
+  componentWillReceiveProps(nextProps) {
+    const childrens = this.props.children instanceof Array ? this.props.children : [this.props.children];
+    const nextChildrens = nextProps.children instanceof Array ? nextProps.children : [nextProps.children];
+    const currentChildren = childrens.filter(item => item);
+    const nextChildren = nextChildrens.filter(item => item);
     if (nextChildren.length !== currentChildren.length) {
       this.setDefaultProps(nextChildren);
+    } else {
+      this.setDefaultProps(nextChildren, this.state.pannelAttr);
     }
   }
+
+  setDefaultProps = (children, oldPannelAttr) => {
+    const pannelAttr = [];
+    const allSize = this.props.vertical ? this.myRef.current.offsetHeight : this.myRef.current.offsetWidth;
+    let isOther = false;
+
+    children.forEach((item, i) => {
+      const { otherTotalSize, otherTotalMin } = this.getOtherTotalSize(children, i);
+      let size = 0;
+      if (item.props.init) {
+        size = item.props.init;
+      } else {
+        if ((i === 0 || i === children.length - 1) && !isOther) {
+          size = allSize - otherTotalSize;
+          isOther = true;
+        } else {
+          size = item.props.min;
+        }
+      }
+      const pannel = {
+        size: size,
+        index: i,
+        max: this.props.vertical ? allSize - otherTotalMin : allSize - otherTotalMin,
+        min: item.props.min,
+        hd: item.props.hd,
+        openDefault: this.openDefault,
+        id: oldPannelAttr && oldPannelAttr[i] && oldPannelAttr[i].id ? oldPannelAttr[i].id : this.randomKey(),
+        props: item.props
+      };
+      pannelAttr.push(pannel);
+    });
+
+    this.setState({
+      size: allSize,
+      pannelAttr
+    });
+    this.pannelAttr = pannelAttr;
+  };
   // 随机生成key
   randomKey = () => {
     const s = [];
@@ -61,42 +104,6 @@ class SplitterPannel extends Component {
       pannelAttr: this.pannelAttr,
       size: allSize
     });
-  };
-  setDefaultProps = children => {
-    const pannelAttr = [];
-    const allSize = this.props.vertical ? this.myRef.current.offsetHeight : this.myRef.current.offsetWidth;
-    let isOther = false;
-    children.forEach((item, i) => {
-      const { otherTotalSize, otherTotalMin } = this.getOtherTotalSize(children, i);
-      let size = 0;
-      if (item.props.init) {
-        size = item.props.init;
-      } else {
-        if ((i === 0 || i === children.length - 1) && !isOther) {
-          size = allSize - otherTotalSize;
-          isOther = true;
-        } else {
-          size = item.props.min;
-        }
-      }
-      const pannel = {
-        size: size,
-        index: i,
-        max: this.props.vertical ? allSize - otherTotalMin : allSize - otherTotalMin,
-        min: item.props.min,
-        hd: item.props.hd,
-        openDefault: this.openDefault,
-        id: this.randomKey(),
-        props: item.props
-      };
-      pannelAttr.push(pannel);
-    });
-
-    this.setState({
-      size: allSize,
-      pannelAttr
-    });
-    this.pannelAttr = pannelAttr;
   };
 
   getOtherTotalSize = (children, index) => {
@@ -222,8 +229,18 @@ class SplitterPannel extends Component {
     return totalSize;
   };
 
+  moving = isMoving => {
+    this.setState({
+      isMoving: isMoving
+    });
+  };
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.resize);
+  }
+
   render() {
-    const { pannelAttr } = this.state;
+    const { pannelAttr, isMoving } = this.state;
     const className = this.props.vertical
       ? 'splitter-pannel splitter-pannel-vertical'
       : 'splitter-pannel splitter-pannel-horizontal';
@@ -240,6 +257,8 @@ class SplitterPannel extends Component {
               countStart={this.countStart}
               countMove={this.countMove}
               countEnd={this.countEnd}
+              moving={this.moving}
+              isMoving={isMoving}
             />
           );
         })}
